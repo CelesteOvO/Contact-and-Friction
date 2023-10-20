@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.24)
+project(000-BasicCollision VERSION 2.0.0 DESCRIPTION "LYF YunDao" LANGUAGES CXX)
+
+add_executable(000-BasicCollision main.cpp)
+target_link_libraries(000-BasicCollision OpenGL::GL polyscope)
+set_target_properties(000-BasicCollision PROPERTIES CXX_STANDARD 20 CXX_EXTENSIONS ON)
+target_compile_options(000-BasicCollision PRIVATE -Wall -Wextra -Wpedantic)
+if(MSVC)
+    set_property(TARGET 000-BasicCollision PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif()
