@@ -6,15 +6,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenGL REQUIRED)
 
-#set(collision_HEADERS include/collision/CollisionDetect.h
-#        include/collision/Geometry.h )
-#set(collision_SOURCE include/collision/CollisionDetect.cpp )
-#
+set(collision_HEADERS include/collision/CollisionDetect.h)
+set(collision_SOURCE include/collision/CollisionDetect.cpp)
+
 set(rigidbody_HEADERS include/body/RigidBody.h
         include/body/Geometry.h
+        include/body/Scenarios.h
         #[[include/body/RigidBodySystem.h
         include/rigidbody/Scenarios.h]] )
 set(rigidbody_SOURCE include/body/RigidBody.cpp
+        include/body/Scenarios.cpp
         #[[include/rigidbody/RigidBodySystem.cpp]] )
 #
 set(engine_HEADERS include/engine/PhysicsWorld.h)
@@ -39,7 +40,7 @@ set(tutorials_SOURCE tutorials/000-basic-collision/main.cpp)
 
 add_executable (Contact ${tutorials_SOURCE}
         ${contact_HEADERS} ${contact_SOURCE}
-#        ${collision_HEADERS} ${collision_SOURCE}
+        ${collision_HEADERS} ${collision_SOURCE}
         ${engine_HEADERS} ${engine_SOURCE}
         ${rigidbody_HEADERS} ${rigidbody_SOURCE}
 #        ${solver_HEADERS} ${solver_SOURCE}

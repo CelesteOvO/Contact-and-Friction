@@ -23,6 +23,7 @@ Contact::Contact(RigidBody *body0, RigidBody *body1, const Eigen::Vector3f &p, c
     _body1->RigidBodyData._contacts.push_back(this);
 }
 
+/// TODO: 3.Compute the contact Jacobian
 void Contact::computeContactFrame() {
 
 }

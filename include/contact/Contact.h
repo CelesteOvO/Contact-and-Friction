@@ -27,7 +27,6 @@ public:
     Eigen::Vector3f _point; /// 接触点
     Eigen::Vector3f _normal; /// 接触法向量
     Eigen::Vector3f _tangent1, _tangent2; /// 接触切向量
-    float _frictionCoefficient; /// 摩擦系数
     float _penetration; /// 接触深度
 
 
@@ -52,6 +51,7 @@ public:
     Eigen::VectorXf _phi; /// 接触约束误差
     Eigen::VectorXf _lambda; /// 接触约束冲量
 
+    float _frictionCoefficient; /// 摩擦系数
     float _contactStiffness; /// 接触刚度（Baumgarte稳定化）
     float _contactDamping; /// 接触阻尼（Baumgarte稳定化）
 protected:
