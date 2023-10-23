@@ -26,16 +26,13 @@ public:
     /// 从OBJ文件加载网格,并将其添加到缓存中,返回缓存中网格的指针
     static Mesh* loadObj(const std::string& _filename);
 
-    // Clears the mesh cache.
+    /// 清除网格缓存
     static void clear();
 
-    // Returns the container of cached meshes.
-    static MeshCache& cachedMeshes();
-
-private:
-
-    // The one and only instance of the mesh cache.
+public:
+    /// 返回缓存网格的容器
     static MeshCache m_meshCache;
+    /// 将 m_meshCache 声明为静态成员变量的原因是为了保证所有的 MeshAssetRegistry 对象共享同一个网格缓存。这样可以避免重复加载相同的网格数据，节省内存和提高效率。
 };
 
 #endif //CONTACT_MESHASSETS_H

@@ -12,6 +12,9 @@ bool OBJLoader::load(const std::string &filename, Eigen::MatrixXf &meshV, Eigen:
     /// 提取路径，稍后加载mtl文件时会用到
     std::string path = extractPath(filename);
 
+    std::vector<int> inds; // 三角形索引
+    std::vector<Point3D> verts; // 顶点
+
     // Read file
     std::string line;
     while (std::getline(file, line))
@@ -83,4 +86,5 @@ bool OBJLoader::load(const std::string &filename, Eigen::MatrixXf &meshV, Eigen:
 
     // Close file
     file.close();
+    return true;
 }

@@ -10,14 +10,18 @@ find_package(OpenGL REQUIRED)
 #        include/collision/Geometry.h )
 #set(collision_SOURCE include/collision/CollisionDetect.cpp )
 #
-#set(rigidbody_HEADERS include/rigidbody/RigidBody.h
-#        include/rigidbody/RigidBodySystem.h
-#        include/rigidbody/Scenarios.h )
-#set(rigidbody_SOURCE include/rigidbody/RigidBody.cpp
-#        include/rigidbody/RigidBodySystem.cpp )
+set(rigidbody_HEADERS include/body/RigidBody.h
+        include/body/Geometry.h
+        #[[include/body/RigidBodySystem.h
+        include/rigidbody/Scenarios.h]] )
+set(rigidbody_SOURCE include/body/RigidBody.cpp
+        #[[include/rigidbody/RigidBodySystem.cpp]] )
 #
-#set(contact_HEADERS include/contact/Contact.h )
-#set(contact_SOURCE include/contact/Contact.cpp )
+set(engine_HEADERS include/engine/PhysicsWorld.h)
+set(engine_SOURCE include/engine/PhysicsWorld.cpp )
+
+set(contact_HEADERS include/contact/Contact.h )
+set(contact_SOURCE include/contact/Contact.cpp )
 #
 #set(solver_HEADERS include/solvers/Solver.h
 #        include/solvers/SolverBoxPGS.h )
@@ -34,9 +38,10 @@ set(viewer_SOURCE include/viewer/viewer.cpp)
 set(tutorials_SOURCE tutorials/000-basic-collision/main.cpp)
 
 add_executable (Contact ${tutorials_SOURCE}
-#        ${contact_HEADERS} ${contact_SOURCE}
+        ${contact_HEADERS} ${contact_SOURCE}
 #        ${collision_HEADERS} ${collision_SOURCE}
-#        ${rigidbody_HEADERS} ${rigidbody_SOURCE}
+        ${engine_HEADERS} ${engine_SOURCE}
+        ${rigidbody_HEADERS} ${rigidbody_SOURCE}
 #        ${solver_HEADERS} ${solver_SOURCE}
         ${util_HEADERS} ${util_SOURCE}
         ${viewer_HEADERS} ${viewer_SOURCE} )

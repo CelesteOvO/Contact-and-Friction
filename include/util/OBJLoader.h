@@ -45,10 +45,7 @@ public:
 
     /// 从OBJ文件路径@文件名加载网格，并返回网格顶点@网格V和面@网格F
     /// 注意：使用MeshAssets.h中的MeshAssetRegistry类来加载网格，而不是使用此函数，因为之前加载的网格文件将从缓存中加载，这要快得多。
-    bool load(const std::string& filename, Eigen::MatrixXf& meshV, Eigen::MatrixXi& meshF);
-public:
-    std::vector<int> inds; // 三角形索引
-    std::vector<Point3D> verts; // 顶点
+    static bool load(const std::string& filename, Eigen::MatrixXf& meshV, Eigen::MatrixXi& meshF);
 };
 
 #endif //CONTACT_OBJLOADER_H

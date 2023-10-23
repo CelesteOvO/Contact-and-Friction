@@ -18,3 +18,7 @@ Mesh *MeshAssetRegistry::loadObj(const std::string &_filename) {
     return &(m_meshCache[key]);
 }
 
+void MeshAssetRegistry::clear() {
+    m_meshCache.clear();
+}
+
