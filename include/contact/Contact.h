@@ -7,20 +7,20 @@
 typedef Eigen::Matrix<float, -1, 6, Eigen::RowMajor> JBlock; /// Jacobian matrix
 typedef Eigen::Matrix<float, 6, -1, Eigen::ColMajor> JBlockTranspose; /// Transpose of Jacobian matrix
 
+class RigidBody; /// 疑惑没有这个东西就new不出来
+
 class Contact
 {
 public:
-    Contact(RigidBody* body0, RigidBody* body1, const Eigen::Vector3f& p, const Eigen::Vector3f& n, float penetration);
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+public:
+    // Constructor with all parameters.
+    Contact(RigidBody* body0, RigidBody* body1, const Eigen::Vector3f& p, const Eigen::Vector3f& n, float _phi);
     virtual ~Contact() = default;
 
 public:
     void computeContactFrame(); /// 计算接触坐标系, 使用接触法向量和提供的方向dir, dir与第一个切向量对齐, 结果存储在基向量n, t1, t2中
     virtual void computeJacobian();
-
-
-public:
-    // -------------------- Friendship -------------------- //
-    friend class RigidBody;
 
 public:
 
@@ -54,8 +54,8 @@ public:
     float _frictionCoefficient; /// 摩擦系数
     float _contactStiffness; /// 接触刚度（Baumgarte稳定化）
     float _contactDamping; /// 接触阻尼（Baumgarte稳定化）
+
 protected:
-    // Default constructor.
     explicit Contact();
 };
 

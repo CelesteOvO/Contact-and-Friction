@@ -11,7 +11,7 @@ namespace polyscope
     class SurfaceMesh;
 }
 
-enum class BodyType {
+enum BodyType {
     STATIC,
     KINEMATIC,
     DYNAMIC
@@ -33,7 +33,7 @@ public:
 public:
     struct
     {
-        BodyType* _bodyTypes; /// 0: static, 1: kinematic, 2: dynamic
+        BodyType _bodyTypes; /// 0: static, 1: kinematic, 2: dynamic
         float _mass; /// 质量
 
         Eigen::Matrix3f _worldI, _worldIinv; // 冲量和逆冲量矩阵（全局）

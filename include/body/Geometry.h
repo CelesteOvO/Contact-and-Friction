@@ -42,7 +42,9 @@ public:
 class Box : public Geometry
 {
 public:
-    Box(Eigen::Vector3f  _dim) : dim(std::move(_dim)), _type(kBox) { } // Initialize _type in the constructor.
+    Box(Eigen::Vector3f  _dim) : dim(std::move(_dim)), _type(kBox) {
+        halfSize = dim / 2.0f;
+    } // Initialize _type in the constructor.
     ~Box() override = default;
 
     Eigen::Matrix3f computeInertia(float _mass) override
@@ -54,6 +56,7 @@ public:
         return m_I;
     }
 public:
+    Eigen::Vector3f halfSize;
     Eigen::Vector3f dim;        // Box dimensions.
     eGeometryType _type;        // Adding eGeometryType member.
 };

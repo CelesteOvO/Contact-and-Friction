@@ -1,14 +1,12 @@
 #include "Contact.h"
 
 Contact::Contact() : _point(), _normal(), _tangent1(), _tangent2(), _frictionCoefficient(0.4f),
-    _body0(nullptr), _body1(nullptr), _contactStiffness(1e6f), _contactDamping(1e5f), _index(-1), _penetration(0.0f)
+                     _body0(nullptr), _body1(nullptr), _contactStiffness(1e6f), _contactDamping(1e5f), _index(-1), _penetration(0.0f)
 {
-
 }
 
-Contact::Contact(RigidBody *body0, RigidBody *body1, const Eigen::Vector3f &p, const Eigen::Vector3f &n,
-                 float penetration) : _point(p), _normal(n), _tangent1(), _tangent2(), _frictionCoefficient(0.4f),
-                                      _body0(body0), _body1(body1), _contactStiffness(1e6f), _contactDamping(1e5f), _index(-1), _penetration(0.0f)
+Contact::Contact(RigidBody* body0, RigidBody* body1, const Eigen::Vector3f& p, const Eigen::Vector3f& n, float penetration): _point(p), _normal(n), _tangent1(), _tangent2(), _penetration(0.0f), _frictionCoefficient(0.4f),
+                                                                                                                             _body0(body0), _body1(body1), _contactStiffness(1e6f), _contactDamping(1e5f), _index(-1)
 {
     _Jacobian0.setZero(3, 6);
     _Jacobian1.setZero(3, 6);
@@ -32,6 +30,7 @@ void Contact::computeJacobian() {
 
 
 }
+
 
 
 
