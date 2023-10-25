@@ -3,6 +3,8 @@
 
 #include "Geometry.h"
 #include "contact/Contact.h"
+#include "util/MeshAssets.h"
+#include "polyscope/surface_mesh.h"
 #include <Eigen/Dense>
 #include <vector>
 
@@ -28,9 +30,7 @@ public:
     void getVelocityAtPos(const Eigen::Vector3f& pos, Eigen::Vector3f& vel);
 
 public:
-    // -------------------- Friendship -------------------- //
-    friend class Contact;
-public:
+    static int counter;
     struct
     {
         BodyType _bodyTypes; /// 0: static, 1: kinematic, 2: dynamic
