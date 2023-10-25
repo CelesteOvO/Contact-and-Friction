@@ -11,8 +11,8 @@ class Scenarios
         Scenarios() = default;
         ~Scenarios() = default;
 
-        static void createMarbleBox();
-        static void createSphereOnBox();
+        static void createMarbleBox(PhysicsWorld& physicsWorld);
+        static void createSphereOnBox(PhysicsWorld& physicsWorld);
 };
 
 #endif //CONTACT_SCENARIOS_H
