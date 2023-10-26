@@ -45,8 +45,8 @@ void Contact::computeContactFrame() {
 /// TODO: 4. 计算接触点的雅可比矩阵
 void Contact::computeJacobian() {
     /// 计算刚体0的雅可比矩阵
-    Eigen::Vector3f r0 = _point - _body0->RigidBodyData._x;
-    Eigen::Vector3f r1 = _point - _body1->RigidBodyData._x;
+    Eigen::Vector3f r0 = _point - _body0->RigidBodyData._position;
+    Eigen::Vector3f r1 = _point - _body1->RigidBodyData._position;
 
     Eigen::Matrix3f skew0 = Eigen::Matrix3f::Zero();
     skew0 << 0, -r0.z(), r0.y(),
@@ -60,8 +60,8 @@ void Contact::computeJacobian() {
 
     Eigen::Matrix3f I = Eigen::Matrix3f::Identity();
 
-    Eigen::Matrix3f R0 = _body0->RigidBodyData._q.toRotationMatrix();
-    Eigen::Matrix3f R1 = _body1->RigidBodyData._q.toRotationMatrix();
+    Eigen::Matrix3f R0 = _body0->RigidBodyData._orientation.toRotationMatrix();
+    Eigen::Matrix3f R1 = _body1->RigidBodyData._orientation.toRotationMatrix();
 
     Eigen::Matrix3f Jv0 = -I;
     Eigen::Matrix3f Jv1 = I;

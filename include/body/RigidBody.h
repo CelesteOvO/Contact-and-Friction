@@ -8,6 +8,9 @@
 #include <Eigen/Dense>
 #include <vector>
 
+class Contact;
+struct Mesh;
+
 namespace polyscope
 {
     class SurfaceMesh;

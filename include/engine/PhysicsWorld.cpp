@@ -26,8 +26,8 @@ PhysicsWorld::PhysicsWorld() : _preStepFunc(nullptr), _resetFunc(nullptr)
     physicsWorldData._frictionCoefficient = 0.4f;
     physicsWorldData._solverIter = 10;
 
-    /*_collisionDetect = std::make_unique<CollisionDetect>(this);
-    _solver = new SolverBoxPGS(this);*/
+    _collisionDetect = std::make_unique<CollisionDetect>(this);
+    //_solver = new SolverBoxPGS(this);
 }
 
 PhysicsWorld::~PhysicsWorld()

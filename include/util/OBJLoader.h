@@ -10,33 +10,30 @@
 #include <string>
 #include <cassert>
 
+namespace {
+    // 2D/3D point data structures
+    struct Point3D {
+        Point3D() : x(0), y(0), z(0) {}
 
-// 2D/3D point data structures
-struct Point3D
-{
-    Point3D() : x(0), y(0), z(0) {}
+        float x, y, z;
+    };
 
-    float x, y, z;
-};
+    struct TriangleInds {
+        TriangleInds() : i(0), j(0), k(0) {}
 
-struct TriangleInds
-{
-    TriangleInds() : i(0), j(0), k(0) {}
+        int i, j, k;
+    };
 
-    int i, j, k;
-};
+    /// 从字符串中提取路径
+    std::string extractPath(const std::string &filepathname) {
+        std::size_t pos = filepathname.find_last_of("/\\");
 
-/// 从字符串中提取路径
-std::string extractPath(const std::string& filepathname)
-{
-    std::size_t pos = filepathname.find_last_of("/\\");
+        if (pos == std::string::npos)
+            return std::string(".");
 
-    if (pos == std::string::npos)
-        return std::string(".");
-
-    return filepathname.substr(0, pos);
+        return filepathname.substr(0, pos);
+    }
 }
-
 
 /// 用于OBJ网格的文件加载
 class OBJLoader

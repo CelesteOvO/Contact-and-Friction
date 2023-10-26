@@ -9,6 +9,10 @@
 #include <utility>
 #include <vector>
 
+class Contact;
+class CollisionDetect;
+class RigidBody;
+
 class PhysicsWorld
 {
 public:

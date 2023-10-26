@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "viewer/viewer.h"
 
 using namespace std;
@@ -61,7 +63,7 @@ SimViewer::SimViewer() :
 void SimViewer::start()
 {
     // Create the rigid body system and renderer
-    _physicsWorld.reset(new PhysicsWorld);
+    _physicsWorld = std::make_unique<PhysicsWorld>();
 
     // Setup Polyscope
     polyscope::options::programName = "Rigid Body Tutorial"; // set the program name

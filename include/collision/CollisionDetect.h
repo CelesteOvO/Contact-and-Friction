@@ -7,6 +7,10 @@
 #include "body/RigidBody.h"
 #include "contact/Contact.h"
 
+class Contact;
+class RigidBody;
+class PhysicsWorld;
+
 class CollisionDetect
 {
 public:

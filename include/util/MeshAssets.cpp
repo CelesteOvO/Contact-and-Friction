@@ -2,6 +2,8 @@
 #include "MeshAssets.h"
 #include "OBJLoader.h"
 
+std::map<unsigned int, Mesh> MeshAssetRegistry::m_meshCache = std::map<unsigned int, Mesh>();
+
 Mesh *MeshAssetRegistry::loadObj(const std::string &_filename) {
     unsigned int key = std::hash<std::string>{}(_filename);
     auto cacheItr = m_meshCache.find(key);
