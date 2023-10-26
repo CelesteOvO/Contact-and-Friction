@@ -11,23 +11,21 @@ set(collision_SOURCE include/collision/CollisionDetect.cpp)
 
 set(rigidbody_HEADERS include/body/RigidBody.h
         include/body/Geometry.h
-        include/body/Scenarios.h
-        #[[include/body/RigidBodySystem.h
-        include/rigidbody/Scenarios.h]] )
+        include/body/Scenarios.h)
+
 set(rigidbody_SOURCE include/body/RigidBody.cpp
-        include/body/Scenarios.cpp
-        #[[include/rigidbody/RigidBodySystem.cpp]] )
-#
+        include/body/Scenarios.cpp)
+
 set(engine_HEADERS include/engine/PhysicsWorld.h)
 set(engine_SOURCE include/engine/PhysicsWorld.cpp )
 
 set(contact_HEADERS include/contact/Contact.h )
 set(contact_SOURCE include/contact/Contact.cpp )
-#
-#set(solver_HEADERS include/solvers/Solver.h
-#        include/solvers/SolverBoxPGS.h )
-#set(solver_SOURCE include/solvers/SolverBoxPGS.cpp )
-#
+
+set(solver_HEADERS include/solver/Solver.h
+        include/solver/SolverBoxPGS.h )
+set(solver_SOURCE include/solver/SolverBoxPGS.cpp )
+
 set(util_HEADERS include/util/OBJLoader.h
         include/util/MeshAssets.h )
 set(util_SOURCE include/util/OBJLoader.cpp
@@ -43,7 +41,7 @@ add_executable (Contact ${tutorials_SOURCE}
         ${collision_HEADERS} ${collision_SOURCE}
         ${engine_HEADERS} ${engine_SOURCE}
         ${rigidbody_HEADERS} ${rigidbody_SOURCE}
-#        ${solver_HEADERS} ${solver_SOURCE}
+        ${solver_HEADERS} ${solver_SOURCE}
         ${util_HEADERS} ${util_SOURCE}
         ${viewer_HEADERS} ${viewer_SOURCE} )
 
