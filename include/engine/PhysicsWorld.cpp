@@ -1,5 +1,24 @@
 #include "PhysicsWorld.h"
 
+namespace Eigen
+{
+    typedef Matrix<float, 6, 1, ColMajor> Vector6f;
+    typedef Matrix<float, 4, 3, ColMajor> KinematicMap;
+}
+
+namespace
+{
+    inline Eigen::Quaternionf kinematicMap(const Eigen::Quaternionf& q, const Eigen::Vector3f& omega)
+    {
+        return 0.5f * Eigen::Quaternionf(
+                -q.x() * omega.x() - q.y() * omega.y() - q.z() * omega.z(),
+                q.w() * omega.x() + q.z() * omega.y() - q.y() * omega.z(),
+                -q.z() * omega.x() + q.w() * omega.y() + q.x() * omega.z(),
+                -q.y() * omega.x() - q.x() * omega.y() + q.w() * omega.z()
+        );
+    }
+}
+
 PhysicsWorld::PhysicsWorld() : _preStepFunc(nullptr), _resetFunc(nullptr)
 {
     physicsWorldData._contactStiffness = 1e6f;
@@ -40,7 +59,7 @@ void PhysicsWorld::step(float dt) {
     }
 
     /// 3. 检测碰撞，计算接触的雅可比矩阵
-    _collisionDetect->detectCollisions();
+    _collisionDetect->detectCollisions(); /// 把所有的接触点都存储在了 _contacts 中
     _collisionDetect->computeContactJacobians();
 
     /// 4. 更新所有接触的接触刚度和阻尼
@@ -70,7 +89,7 @@ void PhysicsWorld::step(float dt) {
         b->RigidBodyData._angularVelocity += dt * b->RigidBodyData._worldIinv * (b->RigidBodyData._torque - b->RigidBodyData._angularVelocity.cross(b->RigidBodyData._worldI * b->RigidBodyData._angularVelocity));
         /// TODO: 2. 更新刚体的位置和旋转
         b->RigidBodyData._position += dt * b->RigidBodyData._linearVelocity;
-        //b->RigidBodyData._orientation += dt * 0.5f * b->RigidBodyData._orientation * b->RigidBodyData._angularVelocity;
+        b->RigidBodyData._orientation = dt * kinematicMap(b->RigidBodyData._orientation, b->RigidBodyData._angularVelocity) * b->RigidBodyData._orientation;
     }
 
 }

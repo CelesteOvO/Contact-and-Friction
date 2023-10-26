@@ -5,6 +5,20 @@
 #include <Eigen/Dense>
 #include <vector>
 
+#include "polyscope/polyscope.h"
+#include "polyscope/surface_mesh.h"
+#include "polyscope/point_cloud.h"
+#include "polyscope/pick.h"
+#include "polyscope/view.h"
+#include "imgui.h"
+
+#include <iostream>
+#include <functional>
+
+#include "contact/Contact.h"
+#include "engine/PhysicsWorld.h"
+#include "body/Scenarios.h"
+
 namespace polyscope // polyscope is a visualization toolkit
 {
     class SurfaceMesh; // SurfaceMesh is a class for storing and visualizing triangle meshes
@@ -12,14 +26,14 @@ namespace polyscope // polyscope is a visualization toolkit
 }
 
 class Contact; // storing contact information
-class RigidBodySystem; // storing rigid body information
+class PhysicsWorld; // storing rigid body information
 class RigidBody; // storing rigid body information
 
 class SimViewer // visualizing a simulation
 {
 public:
     SimViewer();
-    virtual ~SimViewer();
+    virtual ~SimViewer() = default;
 
     void start(); // start the simulation
 
@@ -47,12 +61,12 @@ private:
 private:
 
     // Simulation parameters
-    float m_dt;                         //< Time step parameter.
-    int m_subSteps;
-    bool m_paused;                      //< Pause the simulation.
-    bool m_stepOnce;                    //< Advance the simulation by one frame and then stop.
+    float _dt;                         //< Time step parameter.
+    int _subSteps;
+    bool _paused;                      //< Pause the simulation.
+    bool _stepOnce;                    //< Advance the simulation by one frame and then stop.
 
-    std::unique_ptr<RigidBodySystem> m_rigidBodySystem;
+    std::unique_ptr<PhysicsWorld> _physicsWorld;
 };
 
 #endif //CONTACT_AND_FRICTION_VIEWER_H

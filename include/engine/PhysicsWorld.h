@@ -9,12 +9,6 @@
 #include <utility>
 #include <vector>
 
-namespace Eigen
-{
-    typedef Matrix<float, 6, 1, ColMajor> Vector6f;
-    typedef Matrix<float, 4, 3, ColMajor> KinematicMap;
-}
-
 class PhysicsWorld
 {
 public:

@@ -1,19 +1,5 @@
 #include "viewer/viewer.h"
 
-#include "polyscope/polyscope.h"
-#include "polyscope/surface_mesh.h"
-#include "polyscope/point_cloud.h"
-#include "polyscope/pick.h"
-#include "polyscope/view.h"
-#include "imgui.h"
-
-#include <iostream>
-#include <functional>
-
-#include "contact/Contact.h"
-#include "rigidbody/RigidBodySystem.h"
-#include "rigidbody/Scenarios.h"
-
 using namespace std;
 
 /// 在刚体系统中更新网格模型的位置和接触点的可视化信息
@@ -30,21 +16,21 @@ namespace
             Eigen::Vector3f(-0.71f, 0, -0.71f)
     };
 
-    static void updateRigidBodyMeshes(RigidBodySystem& _rigidBodySystem) // update the position of the rigid body meshes
+    void updateRigidBodyMeshes(PhysicsWorld& _physicsWorld) // update the position of the rigid body meshes
     {
-        auto& bodies = _rigidBodySystem.getBodies();
-        for(unsigned int i = 0; i < bodies.size(); ++i)
+        auto& bodies = _physicsWorld._bodies;
+        for(auto & bodie : bodies)
         {
             Eigen::Isometry3f tm = Eigen::Isometry3f::Identity(); // 4x4 matrix
-            tm.linear() = bodies[i]->q.toRotationMatrix(); // rotation matrix
-            tm.translation() = bodies[i]->x; // translation vector (position)
-            bodies[i]->mesh->setTransform( glm::make_mat4x4(tm.data()) ); // set the transformation matrix
+            tm.linear() = bodie->RigidBodyData._orientation.toRotationMatrix(); // rotation matrix
+            tm.translation() = bodie->RigidBodyData._position; // translation vector (position)
+            bodie->RigidBodyData._mesh->setTransform( glm::make_mat4x4(tm.data()) ); // set the transformation matrix
         }
     }
 
-    static void updateContactPoints(RigidBodySystem& _rigidBodySystem) // update the contact points
+    void updateContactPoints(PhysicsWorld& _physicsWorld) // update the contact points
     {
-        const auto& contacts = _rigidBodySystem.getContacts(); // get the contact points
+        const auto& contacts = _physicsWorld._collisionDetect->_contacts; // get the contact points
         const unsigned int numContacts = contacts.size(); // get the number of contact points
         Eigen::MatrixXf contactP(numContacts, 3); // 3D position
         /// 行数为 numContacts,列数为 3 的矩阵,用于存储接触点的位置,每一行代表一个接触点的位置，每一列代表一个坐标轴（x、y、z）
@@ -53,35 +39,29 @@ namespace
 
         for (unsigned int i = 0; i < numContacts; ++i) // for each contact point
         {
-            contactP.row(i) = contacts[i]->p.transpose(); // position
+            contactP.row(i) = contacts[i]->_point.transpose(); // position
             /// 列向量转置为行向量
-            contactN.row(i) = contacts[i]->n.transpose(); // normal
+            contactN.row(i) = contacts[i]->_point.transpose(); // normal
         }
 
         auto pointCloud = polyscope::registerPointCloud("contacts", contactP); // register the point cloud
         pointCloud->setPointColor({ 1.0f, 0.0f, 0.0f }); // set the color of the point cloud
         pointCloud->setPointRadius(0.005); // set the radius of the point cloud
         pointCloud->addVectorQuantity("normal", contactN)->setVectorColor({ 1.0f, 1.0f, 0.0f })->setVectorLengthScale(0.05f)->setEnabled(true); // add the normal vector
-
     }
-
 }
 
 SimViewer::SimViewer() :
-        m_dt(0.0167f), m_subSteps(1),
-        m_paused(true), m_stepOnce(false),
-        m_rigidBodySystem()
-{
-}
-
-SimViewer::~SimViewer()
+        _dt(0.0167f), _subSteps(1),
+        _paused(true), _stepOnce(false),
+        _physicsWorld()
 {
 }
 
 void SimViewer::start()
 {
     // Create the rigid body system and renderer
-    m_rigidBodySystem.reset(new RigidBodySystem);
+    _physicsWorld.reset(new PhysicsWorld);
 
     // Setup Polyscope
     polyscope::options::programName = "Rigid Body Tutorial"; // set the program name
@@ -102,7 +82,7 @@ void SimViewer::start()
     /// 将 SimViewer 类的 draw 函数与 polyscope 库中的用户回调函数进行绑定，以便在适当的时候执行 draw 函数。用于在可视化程序中绘制或更新图形内容。
 
     // Add pre-step hook.
-    m_rigidBodySystem->setPreStepFunc(std::bind(&SimViewer::preStep, this, std::placeholders::_1));
+    _physicsWorld->setPreStepFunc(std::bind(&SimViewer::preStep, this, std::placeholders::_1));
     /// std::placeholders::_1 表示占位符，表示第一个参数，即 std::vector<RigidBody*>& _bodies
     /// 将 SimViewer 类的 preStep 函数与 m_rigidBodySystem 对象的预步进函数相关联。当 m_rigidBodySystem 执行预步进时，会调用 SimViewer 类的 preStep 函数，并可能传递一个参数（取决于 preStep 函数的定义）。
     /// 这样可以实现在模拟过程中在预步进时执行特定的操作或计算
@@ -117,16 +97,16 @@ void SimViewer::start()
 void SimViewer::drawGUI()
 {
     ImGui::Text("Simulation:");
-    ImGui::Checkbox("Pause", &m_paused);
+    ImGui::Checkbox("Pause", &_paused);
     if (ImGui::Button("Step once"))
     {
-        m_stepOnce = true;
+        _stepOnce = true;
     }
     ImGui::PushItemWidth(100);
-    ImGui::SliderFloat("Time step", &m_dt, 0.0f, 0.1f, "%.3f");
-    ImGui::SliderInt("Num. sub-steps", &m_subSteps, 1, 20, "%u");
-    ImGui::SliderInt("Solver iters.", &(m_rigidBodySystem->solverIter), 1, 100, "%u");
-    ImGui::SliderFloat("Friction coeff.", &(m_rigidBodySystem->mu), 0.0f, 2.0f, "%.2f");
+    ImGui::SliderFloat("Time step", &_dt, 0.0f, 0.1f, "%.3f");
+    ImGui::SliderInt("Num. sub-steps", &_subSteps, 1, 20, "%u");
+    ImGui::SliderInt("Solver iters.", &(_physicsWorld->physicsWorldData._solverIter), 1, 100, "%u");
+    ImGui::SliderFloat("Friction coeff.", &(_physicsWorld->physicsWorldData._frictionCoefficient), 0.0f, 2.0f, "%.2f");
     ImGui::PopItemWidth();
 
     if (ImGui::Button("Sphere on box")) {
@@ -141,38 +121,38 @@ void SimViewer::draw()
 {
     drawGUI();
 
-    if( !m_paused || m_stepOnce )
+    if( !_paused || _stepOnce )
     {
         // Step the simulation.
         // The time step dt is divided by the number of sub-steps.
-        //
-        const float dt = m_dt / (float)m_subSteps; // time step
-        for(int i = 0; i < m_subSteps; ++i) // for each sub-step
+
+        const float dt = _dt / (float)_subSteps; // time step
+        for(int i = 0; i < _subSteps; ++i) // for each sub-step
         {
-            m_rigidBodySystem->step(dt); // step the rigid body system
+            _physicsWorld->step(dt); // step the rigid body system
         }
 
-        updateRigidBodyMeshes(*m_rigidBodySystem);
-        updateContactPoints(*m_rigidBodySystem);
+        updateRigidBodyMeshes(*_physicsWorld);
+        updateContactPoints(*_physicsWorld);
 
 
         // Clear step-once flag.
-        m_stepOnce = false;
+        _stepOnce = false;
         /// 用于在模拟过程中暂停模拟，或者在模拟过程中单步执行模拟
     }
 }
 
 void SimViewer::createMarbleBox()
 {
-    Scenarios::createMarbleBox(*m_rigidBodySystem);
-    updateRigidBodyMeshes(*m_rigidBodySystem);
+    Scenarios::createMarbleBox(*_physicsWorld);
+    updateRigidBodyMeshes(*_physicsWorld);
     polyscope::view::resetCameraToHomeView(); /// 将视图的相机重置为“主视图”
 }
 
 void SimViewer::createSphereOnBox()
 {
-    Scenarios::createSphereOnBox(*m_rigidBodySystem);
-    updateRigidBodyMeshes(*m_rigidBodySystem);
+    Scenarios::createSphereOnBox(*_physicsWorld);
+    updateRigidBodyMeshes(*_physicsWorld);
     polyscope::view::resetCameraToHomeView();
 }
 
