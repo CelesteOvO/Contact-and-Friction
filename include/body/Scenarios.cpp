@@ -55,6 +55,7 @@ void Scenarios::createMarbleBox(PhysicsWorld& physicsWorld) {
     physicsWorld.addRigidBody(body1);
     physicsWorld.addRigidBody(body2);
     physicsWorld.addRigidBody(body3);
+    physicsWorld.addRigidBody(body4);
 }
 
 void Scenarios::createSphereOnBox(PhysicsWorld& physicsWorld) {
@@ -70,7 +71,7 @@ void Scenarios::createSphereOnBox(PhysicsWorld& physicsWorld) {
     bodySphere->RigidBodyData._mesh->setTransparency(0.8f);
 
     // Create a box.
-    auto* bodyBox = new RigidBody(1.0f, new Box(Eigen::Vector3f(0.4f, 4.0f, 10.0f)), "D:\\project\\rigidBodyTutorial\\resources\\box_side.obj");
+    auto* bodyBox = new RigidBody(1.0f, new Box(Eigen::Vector3f(10.0f, 0.4f, 10.0f)), "D:\\project\\rigidBodyTutorial\\resources\\box_bot.obj");
     bodyBox->RigidBodyData._bodyTypes = STATIC;
 
     physicsWorld.addRigidBody(bodySphere);
