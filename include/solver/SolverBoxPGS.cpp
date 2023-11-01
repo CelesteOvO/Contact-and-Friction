@@ -43,7 +43,7 @@ void SolverBoxPGS::solve(float dt) {
         {
             for(int i = 0; i < numContacts; ++i)
             {
-                Contact* c = contacts[i];
+                /*Contact* c = contacts[i];
                 Eigen::Vector3f x = c->_lambda;
                 Eigen::Vector3f b = -gamma * c->_phi / dt - c->_Jacobian0 * c->_body0->RigidBodyData._linearVelocity - dt * c->_Jacobian0Minv * c->_body0->RigidBodyData._linearForce;
                 for(auto other : c->_body0->RigidBodyData._contacts)
@@ -61,7 +61,7 @@ void SolverBoxPGS::solve(float dt) {
                     }
                 }
                 Aii_contact.push_back(c->_JMinvJT);
-                c->_lambda = Aii_contact[i].inverse() * x;
+                c->_lambda = Aii_contact[i].inverse() * x;*/
             }
         }
     }

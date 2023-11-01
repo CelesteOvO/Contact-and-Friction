@@ -12,6 +12,7 @@
 class Contact;
 class CollisionDetect;
 class RigidBody;
+class Solver;
 
 class PhysicsWorld
 {

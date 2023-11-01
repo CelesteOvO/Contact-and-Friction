@@ -28,9 +28,18 @@ public:
     void collisionDetectSphereBox(RigidBody* body0, RigidBody* body1);
     void collisionDetectBoxBox(RigidBody* body0, RigidBody* body1);
 
+    /// further
+    float penetrationOnAxis(RigidBody *pBody, RigidBody *pBody1, const Eigen::Vector3f& matrix);
+    float transformToAxis(RigidBody *pBody, const Eigen::Vector3f& axis);
+    void collisionDetectFaceVertex(RigidBody* body0, RigidBody* body1);
+    void collisionDetectEdgeEdge(RigidBody* body0, RigidBody* body1);
+
+
 public:
     PhysicsWorld* _physicsWorld;
     std::vector<Contact*> _contacts;
+
+
 };
 
 #endif //CONTACT_COLLISIONDETECT_H

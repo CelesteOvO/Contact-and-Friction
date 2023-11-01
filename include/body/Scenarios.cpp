@@ -16,6 +16,7 @@ void Scenarios::createMarbleBox(PhysicsWorld& physicsWorld) {
             body1->RigidBodyData._position.x() = -4.0f + (float)i * 1.0f;
             body1->RigidBodyData._position.z() = -4.0f + (float)j * 1.0f;
             body1->RigidBodyData._position.y() = 2.0f;
+            body1->RigidBodyData._bodyTypes = DYNAMIC;
             physicsWorld.addRigidBody(body1);
             body1->RigidBodyData._mesh->setSurfaceColor({ 1.0f, 0.1f, 0.1f });
             body1->RigidBodyData._mesh->setTransparency(0.8f);
@@ -23,6 +24,7 @@ void Scenarios::createMarbleBox(PhysicsWorld& physicsWorld) {
             body2->RigidBodyData._position.x() = -4.0f + (float)i * 1.0f;
             body2->RigidBodyData._position.z() = -4.0f + (float)j * 1.0f;
             body2->RigidBodyData._position.y() = 3.0f;
+            body2->RigidBodyData._bodyTypes = DYNAMIC;
             physicsWorld.addRigidBody(body2);
             body2->RigidBodyData._mesh->setSurfaceColor({ 1.0f, 0.1f, 0.1f });
             body2->RigidBodyData._mesh->setTransparency(0.8f);
@@ -69,6 +71,7 @@ void Scenarios::createSphereOnBox(PhysicsWorld& physicsWorld) {
     bodySphere->RigidBodyData._position.y() = 4.0f;
     bodySphere->RigidBodyData._angularVelocity = Eigen::Vector3f(10.0f, 0.0f, 0.0f);
     bodySphere->RigidBodyData._mesh->setTransparency(0.8f);
+    bodySphere->RigidBodyData._bodyTypes = DYNAMIC;
 
     // Create a box.
     auto* bodyBox = new RigidBody(1.0f, new Box(Eigen::Vector3f(10.0f, 0.4f, 10.0f)), "D:\\project\\rigidBodyTutorial\\resources\\box_bot.obj");

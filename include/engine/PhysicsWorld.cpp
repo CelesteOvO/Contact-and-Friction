@@ -60,7 +60,12 @@ void PhysicsWorld::step(float dt) {
 
     /// 3. 检测碰撞，计算接触的雅可比矩阵
     _collisionDetect->detectCollisions(); /// 把所有的接触点都存储在了 _contacts 中
-    _collisionDetect->computeContactJacobians();
+
+    /// TODO 基于约束的
+    //_collisionDetect->computeContactJacobians();
+
+    /// TODO 基于脉冲的
+
 
     /// 4. 更新所有接触的接触刚度和阻尼
     for(auto c : _collisionDetect->_contacts)
@@ -72,12 +77,16 @@ void PhysicsWorld::step(float dt) {
 
     for(auto b : _bodies)
     {
-        b->RigidBodyData._linearForce.setZero();
+        b->RigidBodyData._linearConstraintForce.setZero();
         b->RigidBodyData._angularConstraintForce.setZero();
     }
 
+    /// TODO 基于约束的
     /// 5. 计算约束力
-    calcConstraintForces(dt);
+    //calcConstraintForces(dt);
+
+    /// TODO 基于脉冲的
+    /// 5. 计算惩罚力
 
     /// TODO: 1. 更新刚体的位置和旋转
     /// 6. 更新刚体的线速度和角速度
@@ -117,7 +126,7 @@ void PhysicsWorld::computeInertias() {
 }
 
 void PhysicsWorld::calcConstraintForces(float dt) const {
-    //_solver->setMaxIter(physicsWorldData._solverIter);
+    //_solver->_maxIter = physicsWorldData._solverIter;
     //_solver->solve(dt);
 
     for(const auto c : _collisionDetect->_contacts)

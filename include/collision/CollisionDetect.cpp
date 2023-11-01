@@ -37,6 +37,13 @@ void CollisionDetect::detectCollisions() {
                      body0->RigidBodyData._geometry->_type == kBox )
             {
                 collisionDetectSphereBox(body1, body0);
+            }else if( body0->RigidBodyData._geometry->_type == kBox &&
+                      body1->RigidBodyData._geometry->_type == kBox )
+            {
+                double dist = (body0->RigidBodyData._position - body1->RigidBodyData._position).norm();
+                double diagonal = body0->RigidBodyData._geometry->getDiagonal() + body1->RigidBodyData._geometry->getDiagonal();
+                if(dist < diagonal)
+                    collisionDetectBoxBox(body0, body1);
             }
         }
     }
@@ -139,8 +146,58 @@ void CollisionDetect::collisionDetectSphereBox(RigidBody *body0, RigidBody *body
 }
 
 void CollisionDetect::collisionDetectBoxBox(RigidBody *body0, RigidBody *body1) {
+    std::vector<Eigen::Vector3f> axis;
+    Box* box0 = dynamic_cast<Box*>(body0->RigidBodyData._geometry.get());
+    Box* box1 = dynamic_cast<Box*>(body1->RigidBodyData._geometry.get());
+
+    for (int i = 0; i < 3; i++) {
+        axis.emplace_back(body0->RigidBodyData._orientation.matrix().col(i));
+        axis.emplace_back(body1->RigidBodyData._orientation.matrix().col(i));
+    }
+
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            Eigen::Vector3f temp = axis[i].cross(axis[3+j]);
+            if(temp.norm() > 1e-6f)
+                axis.emplace_back(temp.normalized());
+        }
+    }
+
+    float minOverlap = 1e10f;
+    Eigen::Vector3f minAxis;
+    for (unsigned int i = 0; i < 15; i++)
+    {
+        Eigen::Vector3f temp = axis[i];
+        if(temp.norm() < 1e-6f)
+            continue;
+        temp.normalize();
+        float overlap = penetrationOnAxis(body0, body1, temp);
+    }
+
+
 
 }
+
+float CollisionDetect::penetrationOnAxis(RigidBody *pBody, RigidBody *pBody1, const Eigen::Vector3f& axis) {
+    float one = transformToAxis(pBody, axis);
+    float two = transformToAxis(pBody1, axis);
+    float center = abs((pBody->RigidBodyData._position - pBody1->RigidBodyData._position).dot(axis));
+    return one + two - center;
+}
+
+float CollisionDetect::transformToAxis(RigidBody *pBody, const Eigen::Vector3f &axis) {
+    float projectionMax = -1e10f;
+    float projectionMin = 1e10f;
+    for(int i = 0; i < 8; i++)
+    {
+
+    }
+}
+
+
+
 
 
 
