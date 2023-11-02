@@ -147,8 +147,6 @@ void CollisionDetect::collisionDetectSphereBox(RigidBody *body0, RigidBody *body
 
 void CollisionDetect::collisionDetectBoxBox(RigidBody *body0, RigidBody *body1) {
     std::vector<Eigen::Vector3f> axis;
-    Box* box0 = dynamic_cast<Box*>(body0->RigidBodyData._geometry.get());
-    Box* box1 = dynamic_cast<Box*>(body1->RigidBodyData._geometry.get());
 
     for (int i = 0; i < 3; i++) {
         axis.emplace_back(body0->RigidBodyData._orientation.matrix().col(i));
@@ -166,7 +164,7 @@ void CollisionDetect::collisionDetectBoxBox(RigidBody *body0, RigidBody *body1) 
     }
 
     float minOverlap = 1e10f;
-    Eigen::Vector3f minAxis;
+    unsigned int bestAxis = 15;
     for (unsigned int i = 0; i < 15; i++)
     {
         Eigen::Vector3f temp = axis[i];
@@ -174,10 +172,26 @@ void CollisionDetect::collisionDetectBoxBox(RigidBody *body0, RigidBody *body1) 
             continue;
         temp.normalize();
         float overlap = penetrationOnAxis(body0, body1, temp);
+        if(overlap < 0)
+            return;
+        if(overlap < minOverlap)
+        {
+            minOverlap = overlap;
+            bestAxis = i;
+        }
     }
 
-
-
+    if(bestAxis <= 2)
+    {
+        collisionDetectFaceVertex(body0, body1, axis[bestAxis], minOverlap);
+    }else if(bestAxis <= 5)
+    {
+        collisionDetectFaceVertex(body1, body0, axis[bestAxis], minOverlap);
+    }else{
+        int oneAxisIndex = (bestAxis - 6) / 3;
+        int twoAxisIndex = bestAxis % 3;
+        collisionDetectEdgeEdge(body0, body1, axis[bestAxis], minOverlap, oneAxisIndex, twoAxisIndex);
+    }
 }
 
 float CollisionDetect::penetrationOnAxis(RigidBody *pBody, RigidBody *pBody1, const Eigen::Vector3f& axis) {
@@ -188,12 +202,87 @@ float CollisionDetect::penetrationOnAxis(RigidBody *pBody, RigidBody *pBody1, co
 }
 
 float CollisionDetect::transformToAxis(RigidBody *pBody, const Eigen::Vector3f &axis) {
+    Box* box0 = dynamic_cast<Box*>(pBody->RigidBodyData._geometry.get());
     float projectionMax = -1e10f;
     float projectionMin = 1e10f;
-    for(int i = 0; i < 8; i++)
+    for (float cx = -box0->halfSize(0);cx < box0->dim(0);cx += box0->dim(0))
     {
-
+        for (float cy = -box0->halfSize(1);cy < box0->dim(1);cy += box0->dim(1))
+        {
+            for (float cz = -box0->halfSize(2);cz < box0->dim(2);cz += box0->dim(2))
+            {
+                Eigen::Vector3f vertex = Eigen::Vector3f(cx,cy,cz);
+                float projection = vertex.dot(axis);
+                projectionMax = std::max(projectionMax,projection);
+                projectionMin = std::min(projectionMin,projection);
+            }
+        }
     }
+    return (projectionMax - projectionMin) / 2.0f;
+}
+
+void CollisionDetect::collisionDetectFaceVertex(RigidBody *body0, RigidBody *body1, Eigen::Vector3f axis,
+                                                float penetration) {
+    Eigen::Vector3f toCenter = body1->RigidBodyData._position - body0->RigidBodyData._position;
+    if(axis.dot(toCenter) > 0)
+        axis *= -1;
+    Box* box1 = dynamic_cast<Box*>(body1->RigidBodyData._geometry.get());
+    Eigen::Vector3f vertex = body1->RigidBodyData._position + box1->dim(0) * body1->RigidBodyData._orientation.matrix().col(0) + box1->dim(1) * body1->RigidBodyData._orientation.matrix().col(1) + box1->dim(2) * body1->RigidBodyData._orientation.matrix().col(2);
+    if(body1->RigidBodyData._orientation.matrix().col(0).dot(axis) < 0)
+        vertex -= body1->RigidBodyData._orientation.matrix().col(0);
+    if(body1->RigidBodyData._orientation.matrix().col(1).dot(axis) < 0)
+        vertex -= body1->RigidBodyData._orientation.matrix().col(1);
+    if(body1->RigidBodyData._orientation.matrix().col(2).dot(axis) < 0)
+        vertex -= body1->RigidBodyData._orientation.matrix().col(2);
+
+    auto* c = new Contact(body0, body1, vertex, axis, penetration);
+    c->vf = true;
+    _contacts.push_back(c);
+}
+
+void
+CollisionDetect::collisionDetectEdgeEdge(RigidBody *body0, RigidBody *body1, Eigen::Vector3f axis, float penetration, int oneAxisIndex, int twoAxisIndex) {
+    Eigen::Vector3f toCenter = body1->RigidBodyData._position - body0->RigidBodyData._position;
+    if(axis.dot(toCenter) > 0)
+        axis *= -1;
+    Eigen::Vector3f ptOnEdgeOne = body0->RigidBodyData._position;
+    Eigen::Vector3f ptOnEdgeTwo = body1->RigidBodyData._position;
+    Box* box0 = dynamic_cast<Box*>(body0->RigidBodyData._geometry.get());
+    Box* box1 = dynamic_cast<Box*>(body1->RigidBodyData._geometry.get());
+    for(int i = 0; i < 3; i++)
+    {
+        if(i == oneAxisIndex){}
+        else if(body0->RigidBodyData._orientation.matrix().col(i).dot(axis) > 0)
+            ptOnEdgeOne -= box0->halfSize(i) * body0->RigidBodyData._orientation.matrix().col(i);
+        else
+            ptOnEdgeOne += box0->halfSize(i) * body0->RigidBodyData._orientation.matrix().col(i);
+        if(i == twoAxisIndex){}
+        else if(body1->RigidBodyData._orientation.matrix().col(i).dot(axis) < 0)
+            ptOnEdgeTwo -= box1->halfSize(i) * body1->RigidBodyData._orientation.matrix().col(i);
+        else
+            ptOnEdgeTwo += box1->halfSize(i) * body1->RigidBodyData._orientation.matrix().col(i);
+    }
+    Eigen::Vector3f axisOne = body0->RigidBodyData._orientation.matrix().col(oneAxisIndex);
+    Eigen::Vector3f axisTwo = body1->RigidBodyData._orientation.matrix().col(twoAxisIndex);
+    Eigen::Vector3f toSt = ptOnEdgeOne - ptOnEdgeTwo;
+
+    float dpStaOne = axisOne.dot(toSt);
+    float dpStaTwo = axisTwo.dot(toSt);
+
+    float smOne = axisOne.squaredNorm();
+    float smTwo = axisTwo.squaredNorm();
+
+    double dotProductEdges = axisTwo.dot(axisOne);
+    double denom = smOne * smTwo - dotProductEdges * dotProductEdges;
+    double ta = (dotProductEdges * dpStaTwo - smTwo * dpStaOne) / denom;
+    double tb = (smOne * dpStaTwo - dotProductEdges * dpStaOne) / denom;
+
+    Eigen::Vector3f ptOne = ptOnEdgeOne + ta * axisOne;
+    Eigen::Vector3f ptTwo = ptOnEdgeTwo + tb * axisTwo;
+
+    auto* c = new Contact(body0, body1, 0.5f * (ptOne + ptTwo), axis, penetration);
+    c->ee = true;
+    _contacts.push_back(c);
 }
 
 

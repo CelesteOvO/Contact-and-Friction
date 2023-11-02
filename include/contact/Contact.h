@@ -29,6 +29,8 @@ public:
     Eigen::Vector3f _tangent1, _tangent2;
     float _penetration;
 
+    bool vf;
+    bool ee;
 
     unsigned int _index;
 

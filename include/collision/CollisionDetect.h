@@ -30,9 +30,9 @@ public:
 
     /// further
     float penetrationOnAxis(RigidBody *pBody, RigidBody *pBody1, const Eigen::Vector3f& matrix);
-    float transformToAxis(RigidBody *pBody, const Eigen::Vector3f& axis);
-    void collisionDetectFaceVertex(RigidBody* body0, RigidBody* body1);
-    void collisionDetectEdgeEdge(RigidBody* body0, RigidBody* body1);
+    static float transformToAxis(RigidBody *pBody, const Eigen::Vector3f& axis);
+    void collisionDetectFaceVertex(RigidBody* body0, RigidBody* body1, Eigen::Vector3f axis, float penetration);
+    void collisionDetectEdgeEdge(RigidBody* body0, RigidBody* body1, Eigen::Vector3f axis, float penetration, int oneAxisIndex, int twoAxisIndex);
 
 
 public:
